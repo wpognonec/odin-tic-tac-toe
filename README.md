@@ -1,1 +1,1 @@
-# odin-tic-tac-toe
+Tic Tac Toe game in HTML, CSS and JS
