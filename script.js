@@ -15,28 +15,37 @@ const game = (function() {
     gameDone = false
   }
   let findWinner = () => {
+    win = getWinner()
+    if (win === "X") {
+      winner = "X"
+      playerGamesWon++
+      gameDone = true
+      console.log("Winner is", winner);
+    } else if (win === "O") {
+      winner = "O"
+        computerGamesWon++
+        gameDone = true
+        console.log("Winner is", winner)
+    }
+  }
+  let getWinner = () => {
     const win_combos = [
       [0,1,2],[3,4,5],[6,7,8], // Horizontal
       [0,3,6],[1,4,7],[2,5,8], // Vertical
       [0,4,8],[2,4,6]          // Diagonal
     ]
-    
+
     for (combo of win_combos) {
       let mappedCombo = combo.map((i) => board[i]).reduce((t, v) => t + v)
       if (mappedCombo === "XXX") {
-        winner = "X"
-        playerGamesWon++
-        gameDone = true
-        console.log("Winner is", winner);
+        return "X"
       } else if (mappedCombo === "OOO") {
-        winner = "O"
-        computerGamesWon++
-        gameDone = true
-        console.log("Winner is", winner)
+        return "O"
       }
     }
+    return false
   }
-  
+
   let getValidMoves = () => {
     let moves = []
     for ([i,e] of game.getBoard().entries()) {
@@ -45,12 +54,12 @@ const game = (function() {
     return moves
   }
   return {
-    getPlayerGamesWon, getComputerGamesWon, isGameDone, getBoard, placeMarker, init, findWinner, getValidMoves
+    getPlayerGamesWon, getComputerGamesWon, isGameDone, getBoard, placeMarker, init, findWinner, getWinner, getValidMoves
   }
 })()
 
 function displayBoard() {
-  const wrapper = document.querySelector("div.wrapper")
+  const wrapper = document.querySelector("div.gameBoard")
   wrapper.textContent = ""
   board = game.getBoard()
   for (mark in game.getBoard()) {
@@ -67,12 +76,33 @@ function displayBoard() {
 }
 
 function computerPlay() {
-  let validMoves = game.getValidMoves() ;
-  if (validMoves) {
-    let id = Math.floor(Math.random() * validMoves.length)
-    game.placeMarker("O", validMoves[id])
-    displayBoard()
+  let move = getMediumMove()
+  game.placeMarker("O", move)
+  displayBoard()
+}
+
+function getMediumMove() {
+  let validMoves = game.getValidMoves()
+  
+  for (player of ["O", "X"]) {
+    for (move of validMoves) {
+      game.placeMarker(player, move)
+      if (game.getWinner() === player) {
+        return move
+      }
+      game.placeMarker("", move)
+    }
   }
+
+  if (validMoves.includes(4)) {
+    console.log("4");
+    
+    return 4
+  }
+  console.log("random move");
+  
+  return Math.floor(Math.random() * validMoves.length)
+
 }
 
 function clickEvent(e) {
