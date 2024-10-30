@@ -7,15 +7,13 @@ const game = (function() {
   let computerGamesWon = 0
   let getPlayerGamesWon = () => playerGamesWon
   let getComputerGamesWon = () => computerGamesWon
+  let getBoard = () => board
   let isGameDone = () => gameDone
-  let getBoard = () => {
-    return board
+  let placeMarker = (marker, index) => board[index] = marker
+  let init = () => {
+    board = ["","","","","","","","",""];
+    gameDone = false
   }
-  let placeMarker = (marker, index) => {
-    board[index] = marker
-    displayBoard()
-  }
-  let resetBoard = () => board = ["","","","","","","","",""];
   let findWinner = () => {
     const win_combos = [
       [0,1,2],[3,4,5],[6,7,8], // Horizontal
@@ -38,8 +36,16 @@ const game = (function() {
       }
     }
   }
+  
+  let getValidMoves = () => {
+    let moves = []
+    for ([i,e] of game.getBoard().entries()) {
+      if (e === "") moves.push(i)
+    }
+    return moves
+  }
   return {
-    getPlayerGamesWon, getComputerGamesWon, isGameDone, getBoard, placeMarker, resetBoard, findWinner
+    getPlayerGamesWon, getComputerGamesWon, isGameDone, getBoard, placeMarker, init, findWinner, getValidMoves
   }
 })()
 
@@ -60,19 +66,12 @@ function displayBoard() {
   }
 }
 
-function getValidMoves() {
-  let moves = []
-  for ([i,e] of game.getBoard().entries()) {
-    if (e === "") moves.push(i)
-  }
-  return moves
-}
-
 function computerPlay() {
-  let validMoves = getValidMoves() ;
+  let validMoves = game.getValidMoves() ;
   if (validMoves) {
     let id = Math.floor(Math.random() * validMoves.length)
     game.placeMarker("O", validMoves[id])
+    displayBoard()
   }
 }
 
@@ -81,13 +80,24 @@ function clickEvent(e) {
     if (!game.isGameDone()) {
       boxId = parseInt(e.target.id)
       game.placeMarker("X", boxId)
+      displayBoard()
       game.findWinner()
     }
     if (!game.isGameDone()) {
       computerPlay()
       game.findWinner()
     }
+    if (game.isGameDone()) {
+      let button = document.querySelector("button")
+      button.removeAttribute("hidden")
+    }
   }
+}
+
+function resetGame(e) {
+  game.init()
+  displayBoard()
+  e.target.setAttribute("hidden", null)
 }
 
 displayBoard()
