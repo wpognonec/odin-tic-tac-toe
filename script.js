@@ -1,34 +1,45 @@
-const WIN_COMBOS = [
-  [0,1,2],[3,4,5],[6,7,8], // Horizontal
-  [0,3,6],[1,4,7],[2,5,8], // Vertical
-  [0,4,8],[2,4,6]          // Diagonal
-]
 
 const game = (function() {
-  let board = ["","","","","","","","",""];
-  let gameDone = false;
-  let winner = undefined;
+  let board = ["","","","","","","","",""]
+  let gameDone = false
+  let winner = undefined
+  let playerGamesWon = 0
+  let computerGamesWon = 0
+  let getPlayerGamesWon = () => playerGamesWon
+  let getComputerGamesWon = () => computerGamesWon
   let isGameDone = () => gameDone
   let getBoard = () => {
     return board
   }
   let placeMarker = (marker, index) => {
-    board[index] = marker;
+    board[index] = marker
     displayBoard()
   }
   let resetBoard = () => board = ["","","","","","","","",""];
   let findWinner = () => {
-    for (combo of WIN_COMBOS) {
+    const win_combos = [
+      [0,1,2],[3,4,5],[6,7,8], // Horizontal
+      [0,3,6],[1,4,7],[2,5,8], // Vertical
+      [0,4,8],[2,4,6]          // Diagonal
+    ]
+    
+    for (combo of win_combos) {
       let mappedCombo = combo.map((i) => board[i]).reduce((t, v) => t + v)
-      if (mappedCombo === "XXX" || mappedCombo === "OOO") {
-        console.log("Winner is", mappedCombo);
-        winner = mappedCombo === "XXX" ? "X" : "O"
+      if (mappedCombo === "XXX") {
+        winner = "X"
+        playerGamesWon++
         gameDone = true
+        console.log("Winner is", winner);
+      } else if (mappedCombo === "OOO") {
+        winner = "O"
+        computerGamesWon++
+        gameDone = true
+        console.log("Winner is", winner)
       }
     }
   }
   return {
-    isGameDone, getBoard, placeMarker, resetBoard, findWinner
+    getPlayerGamesWon, getComputerGamesWon, isGameDone, getBoard, placeMarker, resetBoard, findWinner
   }
 })()
 
@@ -71,10 +82,11 @@ function clickEvent(e) {
       boxId = parseInt(e.target.id)
       game.placeMarker("X", boxId)
       game.findWinner()
+    }
+    if (!game.isGameDone()) {
       computerPlay()
       game.findWinner()
     }
-
   }
 }
 
