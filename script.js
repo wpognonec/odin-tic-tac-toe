@@ -17,11 +17,10 @@ const game = (function() {
   let resetBoard = () => board = ["","","","","","","","",""];
   let findWinner = () => {
     for (combo of WIN_COMBOS) {
-      let [a,b,c] = combo
-      let possiblyWinner = board[a] + board[b] + board[c]
-      if (possiblyWinner === "XXX" || possiblyWinner === "OOO") {
-        console.log("Winner is", possiblyWinner);
-        winner = possiblyWinner === "XXX" ? "X" : "O"
+      let mappedCombo = combo.map((i) => board[i]).reduce((t, v) => t + v)
+      if (mappedCombo === "XXX" || mappedCombo === "OOO") {
+        console.log("Winner is", mappedCombo);
+        winner = mappedCombo === "XXX" ? "X" : "O"
         resetBoard()
         displayBoard()
       }
