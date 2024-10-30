@@ -6,7 +6,9 @@ const WIN_COMBOS = [
 
 const game = (function() {
   let board = ["","","","","","","","",""];
+  let gameDone = false;
   let winner = undefined;
+  let isGameDone = () => gameDone
   let getBoard = () => {
     return board
   }
@@ -21,13 +23,12 @@ const game = (function() {
       if (mappedCombo === "XXX" || mappedCombo === "OOO") {
         console.log("Winner is", mappedCombo);
         winner = mappedCombo === "XXX" ? "X" : "O"
-        resetBoard()
-        displayBoard()
+        gameDone = true
       }
     }
   }
   return {
-    getBoard, placeMarker, resetBoard, findWinner
+    isGameDone, getBoard, placeMarker, resetBoard, findWinner
   }
 })()
 
@@ -65,13 +66,15 @@ function computerPlay() {
 }
 
 function clickEvent(e) {
-  console.log(e);
   if(e.target.hasAttribute("id") && e.target.textContent === "") {
-    boxId = parseInt(e.target.id)
-    game.placeMarker("X", boxId)
-    game.findWinner()
-    computerPlay()
-    game.findWinner()
+    if (!game.isGameDone()) {
+      boxId = parseInt(e.target.id)
+      game.placeMarker("X", boxId)
+      game.findWinner()
+      computerPlay()
+      game.findWinner()
+    }
+
   }
 }
 
