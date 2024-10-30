@@ -7,32 +7,41 @@ const WIN_COMBOS = [
 const game = (function() {
   let board = ["","","","","","","","",""];
   let winner = undefined;
-  let showBoard = () => {
-    console.log(board.slice(0,3).toString());
-    console.log(board.slice(3,6).toString());
-    console.log(board.slice(6).toString());
+  let getBoard = () => {
+    return board
   }
   let placeMarker = (marker, index) => board[index] = marker;
   let resetBoard = () => board = ["","","","","","","","",""];
+  let findWinner = () => {
+    for (combo of WIN_COMBOS) {
+      let [a,b,c] = combo
+      let possiblyWinner = board[a] + board[b] + board[c]
+      if (possiblyWinner === "XXX" || possiblyWinner === "OOO") {
+        console.log("Winner is", possiblyWinner);
+        winner = possiblyWinner === "XXX" ? "X" : "O"
+        resetBoard()
+      }
+    }
+  }
   return {
-    board, showBoard, placeMarker, resetBoard
+    getBoard, placeMarker, resetBoard, findWinner
   }
 })()
 
-function findWinner() {
-  for (combo of WIN_COMBOS) {
-    let [a,b,c] = combo
-    let winner = game.board[a] + game.board[b] + game.board[c]
-    if (winner === "XXX" || winner === "OOO") {
-      console.log("Winner is", winner);
-      game.winner = winner === "XXX" ? "X" : "O"
-    }
-  }
-}
+// function findWinner() {
+//   for (combo of WIN_COMBOS) {
+//     let [a,b,c] = combo
+//     let winner = game.board[a] + game.board[b] + game.board[c]
+//     if (winner === "XXX" || winner === "OOO") {
+//       console.log("Winner is", winner);
+//       game.winner = winner === "XXX" ? "X" : "O"
+//     }
+//   }
+// }
 
 function getValidMoves() {
   let moves = []
-  for ([i,e] of game.board.entries()) {
+  for ([i,e] of game.getBoard().entries()) {
     if (e === "") moves.push(i)
   }
   return moves
@@ -58,7 +67,7 @@ function computerPlay() {
 
 const wrapper = document.querySelector("div.wrapper")
 
-for (mark in game.board) {
+for (mark in game.getBoard()) {
   const markDiv = document.createElement("div")
   markDiv.id = mark
   markDiv.addEventListener("click", (e) => {
@@ -66,7 +75,9 @@ for (mark in game.board) {
       boxId = parseInt(e.target.id)
       game.placeMarker("X", boxId)
       e.target.textContent = "X"
+      game.findWinner()
       computerPlay()
+      game.findWinner()
     }
     else {
       alert("Choose another square")
