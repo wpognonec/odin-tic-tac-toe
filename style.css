@@ -1,14 +1,21 @@
+body {
+  height: 100vh;
+}
+
 .wrapper {
   display: grid;
-  grid-template-columns: 50px 50px 50px;
-  grid-auto-rows: 50px;
+  grid-template-columns: 150px 150px 150px;
+  grid-auto-rows: 150px;
 }
 
 .wrapper>div {
-  text-align: center;
-  line-height: 50px;
-  width: 50px;
-  height: 50px;
+  display: grid;
+  place-items: center;
   outline: 2px solid;
   outline-offset: -3px;
+}
+
+img {
+  height: 100px;
+  width: 100px;
 }

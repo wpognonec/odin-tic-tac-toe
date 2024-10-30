@@ -32,12 +32,18 @@ const game = (function() {
 })()
 
 function displayBoard() {
+  const wrapper = document.querySelector("div.wrapper")
   wrapper.textContent = ""
   board = game.getBoard()
   for (mark in game.getBoard()) {
     const markDiv = document.createElement("div")
+    if (board[mark] === "X" || board[mark] === "O") {
+      const markImg = document.createElement("img")
+      markImg.src = board[mark] === "X" ? "images/x.svg" : "images/o.svg"
+      markDiv.appendChild(markImg)
+    }
     markDiv.id = mark
-    markDiv.textContent = board[mark]
+    markDiv.addEventListener("click", clickEvent)
     wrapper.appendChild(markDiv)
   }
 }
@@ -58,18 +64,15 @@ function computerPlay() {
   }
 }
 
-const wrapper = document.querySelector("div.wrapper")
-wrapper.addEventListener("click", (e) => {
-  if(e.target.textContent === "") {
+function clickEvent(e) {
+  console.log(e);
+  if(e.target.hasAttribute("id") && e.target.textContent === "") {
     boxId = parseInt(e.target.id)
     game.placeMarker("X", boxId)
     game.findWinner()
     computerPlay()
     game.findWinner()
   }
-  else {
-    alert("Choose another square")
-  }
-})
+}
 
 displayBoard()
