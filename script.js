@@ -70,7 +70,6 @@ function displayBoard() {
       markDiv.appendChild(markImg)
     }
     markDiv.id = mark
-    markDiv.addEventListener("click", clickEvent)
     wrapper.appendChild(markDiv)
   }
 }
@@ -125,5 +124,3 @@ function resetGame(e) {
   displayBoard()
   e.target.setAttribute("hidden", null)
 }
-
-displayBoard()
