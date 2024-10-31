@@ -95,14 +95,10 @@ function getMediumMove() {
   }
 
   if (validMoves.includes(4)) {
-    console.log("4");
-    
     return 4
   }
-  console.log("random move");
-  
-  return Math.floor(Math.random() * validMoves.length)
 
+  return Math.floor(Math.random() * validMoves.length)
 }
 
 function clickEvent(e) {
