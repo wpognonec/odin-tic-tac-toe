@@ -102,7 +102,7 @@ function getMediumMove() {
 }
 
 function clickEvent(e) {
-  if(e.target.hasAttribute("id") && e.target.textContent === "") {
+  if(e.target.hasAttribute("id") && !e.target.hasChildNodes()) {
     if (!game.isGameDone()) {
       boxId = parseInt(e.target.id)
       game.placeMarker("X", boxId)
