@@ -1,3 +1,5 @@
+const X = 1
+const O = -1
 
 const Game = function() {
   let board = ["", "", "", "", "", "", "", "", ""]
@@ -12,20 +14,20 @@ const Game = function() {
       [0,4,8],[2,4,6]          // Diagonal
     ]
 
-    for (let combo of win_combos) {
+    for (const combo of win_combos) {
       const mappedCombo = combo.map((i) => board[i]).reduce((t, v) => t + v)
-      if (mappedCombo === "XXX") {
-        return "X"
-      } else if (mappedCombo === "OOO") {
-        return "O"
+      if (mappedCombo === 3) {
+        return 1
+      } else if (mappedCombo === -3) {
+        return -1
       }
     }
-    return false
+    return 0
   }
 
   const getValidMoves = () => {
     const moves = []
-    for (let [i,e] of board.entries()) {
+    for (const [i,e] of board.entries()) {
       if (!e) moves.push(i)
     }
     return moves
@@ -36,21 +38,24 @@ const Game = function() {
 }
 
 const gameController = (function () {
-  let game = Game()
+  const game = Game()
+  let difficulty = "easy"
   let gameDone = false
-  let gamesWon = { player1: 0, player2: 0 }
+  const gamesWon = { player1: 0, player2: 0 }
+  const getDifficulty = () => difficulty
+  const setDifficulty = (val) => difficulty = val
   const getGamesWon = () => gamesWon
   const isGameDone = () => gameDone
   const processRound = () => {
-    let winner = game.getWinner()
-    if (winner === "X") {
+    const winner = game.getWinner()
+    if (winner === 1) {
       gamesWon.player1++
       gameDone = true
-      console.log("Winner is", winner);
-    } else if (winner === "O") {
+      console.log("Winner is X");
+    } else if (winner === -1) {
       gamesWon.player2++
       gameDone = true
-      console.log("Winner is", winner)
+      console.log("Winner is O")
     } else if (!game.getValidMoves().length) {
       gameDone = true
       console.log("Game is a tie")
@@ -61,18 +66,18 @@ const gameController = (function () {
     gameDone = false
   }
 
-  return { getGamesWon, isGameDone, processRound, init, ...game }
+  return { getDifficulty, setDifficulty, getGamesWon, isGameDone, processRound, init, ...game }
 })()
 
 function displayBoard() {
   const wrapper = document.querySelector("div.gameBoard")
   wrapper.textContent = ""
-  let board = gameController.getBoard()
-  for (let mark in board) {
+  const board = gameController.getBoard()
+  for (const mark in board) {
     const markDiv = document.createElement("div")
-    if (board[mark] === "X" || board[mark] === "O") {
+    if (board[mark] === 1 || board[mark] === -1) {
       const markImg = document.createElement("img")
-      markImg.src = board[mark] === "X" ? "images/x.svg" : "images/o.svg"
+      markImg.src = board[mark] === 1 ? "images/x.svg" : "images/o.svg"
       markDiv.appendChild(markImg)
     }
     markDiv.id = mark
@@ -81,16 +86,36 @@ function displayBoard() {
 }
 
 function computerPlay() {
-  const move = getMediumMove()
-  gameController.placeMarker("O", move)
+  const difficulty = gameController.getDifficulty()
+  let move
+  switch (difficulty) {
+    case "easy":
+      move = getEasyMove()
+      break
+    case "medium":
+      move = getMediumMove()
+      break
+    case "hard":
+      move = getHardMove()
+      break
+    default:
+      move = getEasyMove()
+      break
+  }
+  gameController.placeMarker(O, move)
   displayBoard()
+}
+
+function getEasyMove() {
+  const validMoves = gameController.getValidMoves()
+  return validMoves[Math.floor(Math.random() * validMoves.length)]
 }
 
 function getMediumMove() {
   const validMoves = gameController.getValidMoves()
     
-  for (let player of ["O", "X"]) {
-    for (let move of validMoves) {
+  for (const player of [O, X]) {
+    for (const move of validMoves) {
       gameController.placeMarker(player, move)
       if (gameController.getWinner() === player) {
         return move
@@ -106,11 +131,35 @@ function getMediumMove() {
   return validMoves[Math.floor(Math.random() * validMoves.length)]
 }
 
-function clickEvent(e) {
+function getHardMove() {
+  return minimax(O)[0]
+}
+
+function minimax(player) {
+ 
+  const validMoves = gameController.getValidMoves()
+  let best = [-1, -player]
+  const winner = gameController.getWinner()
+
+  if (!validMoves.length || winner) return [-1, winner]
+
+  for (const choice of validMoves) {
+    gameController.placeMarker(player, choice)
+    let score = minimax(-player)
+    gameController.placeMarker("", choice)
+    score[0] = choice
+
+    if (player === O && (score[1] < best[1])) best = score
+    else if (player === X && (score[1] > best[1])) best = score
+  }
+  return best
+}
+
+function _clickEvent(e) {
   if(e.target.hasAttribute("id") && !e.target.hasChildNodes()) {
     if (!gameController.isGameDone()) {
-      let boxId = parseInt(e.target.id)
-      gameController.placeMarker("X", boxId)
+      const boxId = parseInt(e.target.id)
+      gameController.placeMarker(X, boxId)
       displayBoard()
       gameController.processRound()
     }
@@ -119,14 +168,23 @@ function clickEvent(e) {
       gameController.processRound()
     }
     if (gameController.isGameDone()) {
-      const button = document.querySelector("button")
+      const button = document.querySelector("#resetBtn")
       button.removeAttribute("hidden")
     }
   }
 }
 
-function resetGame(e) {
+function _resetGame(e) {
   gameController.init()
   displayBoard()
   e.target.setAttribute("hidden", null)
+}
+
+function _setDifficulty(e) {
+  const buttons = document.querySelectorAll(".difficulty>button")
+  const difficulty = e.target.textContent.toLowerCase()
+
+  for (const button of buttons) button.className = ""
+  e.target.className = "selected"
+  gameController.setDifficulty(difficulty)
 }
