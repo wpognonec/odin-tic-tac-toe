@@ -1,14 +1,12 @@
 
 const Game = function() {
-  let board = ["","","","","","","","",""]
+  let board = new Array()
   const getBoard = () => board
+  const resetBoard = () => board = new Array()
   const placeMarker = (marker, index) => board[index] = marker
-  const init = () => {
-    board = ["","","","","","","","",""];
-    gameDone = false
-  }
+  
   const findWinner = () => {
-    win = getWinner()
+    let win = getWinner()
     if (win === "X") {
       winner = "X"
       playerGamesWon++
@@ -28,7 +26,7 @@ const Game = function() {
       [0,4,8],[2,4,6]          // Diagonal
     ]
 
-    for (combo of win_combos) {
+    for (let combo of win_combos) {
       const mappedCombo = combo.map((i) => board[i]).reduce((t, v) => t + v)
       if (mappedCombo === "XXX") {
         return "X"
@@ -41,13 +39,13 @@ const Game = function() {
 
   const getValidMoves = () => {
     const moves = []
-    for ([i,e] of game.getBoard().entries()) {
-      if (e === "") moves.push(i)
+    for (let [i,e] of board.entries()) {
+      if (!e) moves.push(i)
     }
     return moves
   }
   return {
-    getBoard, placeMarker, init, findWinner, getWinner, getValidMoves
+    getBoard, placeMarker, findWinner, getWinner, getValidMoves, resetBoard
   }
 }
 
@@ -60,14 +58,14 @@ const gameController = (function () {
   const isGameDone = () => gameDone
   const getWinner = () => winner
 
-  return { getGamesWon, isGameDone, getWinner }
+  return { getGamesWon, isGameDone, getWinner, ...game }
 })()
 
 function displayBoard() {
   const wrapper = document.querySelector("div.gameBoard")
   wrapper.textContent = ""
-  board = game.getBoard()
-  for (mark in game.getBoard()) {
+  let board = gameController.getBoard()
+  for (let mark in board) {
     const markDiv = document.createElement("div")
     if (board[mark] === "X" || board[mark] === "O") {
       const markImg = document.createElement("img")
@@ -81,20 +79,20 @@ function displayBoard() {
 
 function computerPlay() {
   const move = getMediumMove()
-  game.placeMarker("O", move)
+  gameController.placeMarker("O", move)
   displayBoard()
 }
 
 function getMediumMove() {
-  const validMoves = game.getValidMoves()
+  const validMoves = gameController.getValidMoves()
   
-  for (player of ["O", "X"]) {
-    for (move of validMoves) {
-      game.placeMarker(player, move)
-      if (game.getWinner() === player) {
+  for (let player of ["O", "X"]) {
+    for (let move of validMoves) {
+      gameController.placeMarker(player, move)
+      if (gameController.getWinner() === player) {
         return move
       }
-      game.placeMarker("", move)
+      gameController.placeMarker("", move)
     }
   }
 
@@ -107,17 +105,17 @@ function getMediumMove() {
 
 function clickEvent(e) {
   if(e.target.hasAttribute("id") && !e.target.hasChildNodes()) {
-    if (!game.isGameDone()) {
-      boxId = parseInt(e.target.id)
-      game.placeMarker("X", boxId)
+    if (!gameController.isGameDone()) {
+      let boxId = parseInt(e.target.id)
+      gameController.placeMarker("X", boxId)
       displayBoard()
-      game.findWinner()
+      gameController.findWinner()
     }
-    if (!game.isGameDone()) {
+    if (!gameController.isGameDone()) {
       computerPlay()
-      game.findWinner()
+      gameController.findWinner()
     }
-    if (game.isGameDone()) {
+    if (gameController.isGameDone()) {
       const button = document.querySelector("button")
       button.removeAttribute("hidden")
     }
@@ -125,7 +123,7 @@ function clickEvent(e) {
 }
 
 function resetGame(e) {
-  game.init()
+  gameController.init()
   displayBoard()
   e.target.setAttribute("hidden", null)
 }
