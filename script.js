@@ -1,14 +1,7 @@
 
-const game = (function() {
+const Game = function() {
   let board = ["","","","","","","","",""]
-  let gameDone = false
-  let winner = undefined
-  let playerGamesWon = 0
-  let computerGamesWon = 0
-  let getPlayerGamesWon = () => playerGamesWon
-  let getComputerGamesWon = () => computerGamesWon
   let getBoard = () => board
-  let isGameDone = () => gameDone
   let placeMarker = (marker, index) => board[index] = marker
   let init = () => {
     board = ["","","","","","","","",""];
@@ -54,8 +47,20 @@ const game = (function() {
     return moves
   }
   return {
-    getPlayerGamesWon, getComputerGamesWon, isGameDone, getBoard, placeMarker, init, findWinner, getWinner, getValidMoves
+    getBoard, placeMarker, init, findWinner, getWinner, getValidMoves
   }
+}
+
+const gameController = (function () {
+  let game = Game()
+  let gameDone = false
+  let winner = undefined
+  let gamesWon = { player1: 0, player2: 0 }
+  let getGamesWon = () => gamesWon
+  let isGameDone = () => gameDone
+  let getWinner = () => winner
+
+  return { getGamesWon, isGameDone, getWinner }
 })()
 
 function displayBoard() {
