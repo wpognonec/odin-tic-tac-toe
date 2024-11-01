@@ -38,20 +38,16 @@ const Game = function() {
 const gameController = (function () {
   let game = Game()
   let gameDone = false
-  let winner = undefined
   let gamesWon = { player1: 0, player2: 0 }
   const getGamesWon = () => gamesWon
   const isGameDone = () => gameDone
-  const getWinner = () => winner
-  const findWinner = () => {
-    let win = game.getWinner()
-    if (win === "X") {
-      winner = "X"
+  const processRound = () => {
+    let winner = game.getWinner()
+    if (winner === "X") {
       gamesWon.player1++
       gameDone = true
       console.log("Winner is", winner);
-    } else if (win === "O") {
-      winner = "O"
+    } else if (winner === "O") {
       gamesWon.player2++
       gameDone = true
       console.log("Winner is", winner)
@@ -65,7 +61,7 @@ const gameController = (function () {
     gameDone = false
   }
 
-  return { getGamesWon, isGameDone, getWinner, findWinner, init, ...game }
+  return { getGamesWon, isGameDone, processRound, init, ...game }
 })()
 
 function displayBoard() {
@@ -116,11 +112,11 @@ function clickEvent(e) {
       let boxId = parseInt(e.target.id)
       gameController.placeMarker("X", boxId)
       displayBoard()
-      gameController.findWinner()
+      gameController.processRound()
     }
     if (!gameController.isGameDone()) {
       computerPlay()
-      gameController.findWinner()
+      gameController.processRound()
     }
     if (gameController.isGameDone()) {
       const button = document.querySelector("button")
