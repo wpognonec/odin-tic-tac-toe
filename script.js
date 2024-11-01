@@ -1,13 +1,13 @@
 
 const Game = function() {
   let board = ["","","","","","","","",""]
-  let getBoard = () => board
-  let placeMarker = (marker, index) => board[index] = marker
-  let init = () => {
+  const getBoard = () => board
+  const placeMarker = (marker, index) => board[index] = marker
+  const init = () => {
     board = ["","","","","","","","",""];
     gameDone = false
   }
-  let findWinner = () => {
+  const findWinner = () => {
     win = getWinner()
     if (win === "X") {
       winner = "X"
@@ -21,7 +21,7 @@ const Game = function() {
         console.log("Winner is", winner)
     }
   }
-  let getWinner = () => {
+  const getWinner = () => {
     const win_combos = [
       [0,1,2],[3,4,5],[6,7,8], // Horizontal
       [0,3,6],[1,4,7],[2,5,8], // Vertical
@@ -29,7 +29,7 @@ const Game = function() {
     ]
 
     for (combo of win_combos) {
-      let mappedCombo = combo.map((i) => board[i]).reduce((t, v) => t + v)
+      const mappedCombo = combo.map((i) => board[i]).reduce((t, v) => t + v)
       if (mappedCombo === "XXX") {
         return "X"
       } else if (mappedCombo === "OOO") {
@@ -39,8 +39,8 @@ const Game = function() {
     return false
   }
 
-  let getValidMoves = () => {
-    let moves = []
+  const getValidMoves = () => {
+    const moves = []
     for ([i,e] of game.getBoard().entries()) {
       if (e === "") moves.push(i)
     }
@@ -56,9 +56,9 @@ const gameController = (function () {
   let gameDone = false
   let winner = undefined
   let gamesWon = { player1: 0, player2: 0 }
-  let getGamesWon = () => gamesWon
-  let isGameDone = () => gameDone
-  let getWinner = () => winner
+  const getGamesWon = () => gamesWon
+  const isGameDone = () => gameDone
+  const getWinner = () => winner
 
   return { getGamesWon, isGameDone, getWinner }
 })()
@@ -80,13 +80,13 @@ function displayBoard() {
 }
 
 function computerPlay() {
-  let move = getMediumMove()
+  const move = getMediumMove()
   game.placeMarker("O", move)
   displayBoard()
 }
 
 function getMediumMove() {
-  let validMoves = game.getValidMoves()
+  const validMoves = game.getValidMoves()
   
   for (player of ["O", "X"]) {
     for (move of validMoves) {
@@ -118,7 +118,7 @@ function clickEvent(e) {
       game.findWinner()
     }
     if (game.isGameDone()) {
-      let button = document.querySelector("button")
+      const button = document.querySelector("button")
       button.removeAttribute("hidden")
     }
   }
