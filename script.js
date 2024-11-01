@@ -1,24 +1,10 @@
 
 const Game = function() {
-  let board = new Array()
+  let board = ["", "", "", "", "", "", "", "", ""]
   const getBoard = () => board
-  const resetBoard = () => board = new Array()
+  const resetBoard = () => board = ["", "", "", "", "", "", "", "", ""]
   const placeMarker = (marker, index) => board[index] = marker
   
-  const findWinner = () => {
-    let win = getWinner()
-    if (win === "X") {
-      winner = "X"
-      playerGamesWon++
-      gameDone = true
-      console.log("Winner is", winner);
-    } else if (win === "O") {
-      winner = "O"
-        computerGamesWon++
-        gameDone = true
-        console.log("Winner is", winner)
-    }
-  }
   const getWinner = () => {
     const win_combos = [
       [0,1,2],[3,4,5],[6,7,8], // Horizontal
@@ -45,7 +31,7 @@ const Game = function() {
     return moves
   }
   return {
-    getBoard, placeMarker, findWinner, getWinner, getValidMoves, resetBoard
+    getBoard, placeMarker, getWinner, getValidMoves, resetBoard
   }
 }
 
@@ -57,8 +43,29 @@ const gameController = (function () {
   const getGamesWon = () => gamesWon
   const isGameDone = () => gameDone
   const getWinner = () => winner
+  const findWinner = () => {
+    let win = game.getWinner()
+    if (win === "X") {
+      winner = "X"
+      gamesWon.player1++
+      gameDone = true
+      console.log("Winner is", winner);
+    } else if (win === "O") {
+      winner = "O"
+      gamesWon.player2++
+      gameDone = true
+      console.log("Winner is", winner)
+    } else if (!game.getValidMoves().length) {
+      gameDone = true
+      console.log("Game is a tie")
+    }
+  }
+  const init = () => {
+    game.resetBoard()
+    gameDone = false
+  }
 
-  return { getGamesWon, isGameDone, getWinner, ...game }
+  return { getGamesWon, isGameDone, getWinner, findWinner, init, ...game }
 })()
 
 function displayBoard() {
@@ -85,7 +92,7 @@ function computerPlay() {
 
 function getMediumMove() {
   const validMoves = gameController.getValidMoves()
-  
+    
   for (let player of ["O", "X"]) {
     for (let move of validMoves) {
       gameController.placeMarker(player, move)
@@ -100,7 +107,7 @@ function getMediumMove() {
     return 4
   }
 
-  return Math.floor(Math.random() * validMoves.length)
+  return validMoves[Math.floor(Math.random() * validMoves.length)]
 }
 
 function clickEvent(e) {
