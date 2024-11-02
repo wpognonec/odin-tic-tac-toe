@@ -1,7 +1,11 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 .gameBoard {
   display: grid;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 10px;
   grid-template-columns: 150px 150px 150px;
   grid-auto-rows: 150px;
 }
@@ -14,7 +18,7 @@
 }
 
 .gameFooter {
-  margin-top: 20px;
+  margin-top: 10px;
   text-align: center;
 }
 
@@ -29,11 +33,15 @@ button {
   border-radius: 5px;
 }
 
+button:hover {
+  background: lightgray;
+}
+
 .selected {
   background: sandybrown;
 }
 
-.difficulty {
+.difficulty,
+.header {
   text-align: center;
-  margin-top: 20px;
 }

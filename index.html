@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,11 +9,15 @@
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
+
 <body>
-  <div class="difficulty">
-    <button onclick="_setDifficulty(event)" class="selected">EASY</button>
-    <button onclick="_setDifficulty(event)">MEDIUM</button>
-    <button onclick="_setDifficulty(event)">HARD</button>
+  <div class="header">
+    <h1>Tic Tac Toe</h1>
+    <div class="difficulty">
+      <button onclick="_setDifficulty(event)" class="selected">EASY</button>
+      <button onclick="_setDifficulty(event)">MEDIUM</button>
+      <button onclick="_setDifficulty(event)">HARD</button>
+    </div>
   </div>
   <div class="gameBoard" onclick="_clickEvent(event)">
     <div id="0"></div>
@@ -29,4 +34,5 @@
     <button id="resetBtn" hidden onclick="_resetGame(event)">PLAY AGAIN</button>
   </div>
 </body>
+
 </html>

@@ -1,33 +1,30 @@
 const X = 1
 const O = -1
+const EMPTY = 0
 
-const Game = function() {
-  let board = ["", "", "", "", "", "", "", "", ""]
+const Game = function () {
+  let board = Array(9).fill(EMPTY);
   const getBoard = () => board
-  const resetBoard = () => board = ["", "", "", "", "", "", "", "", ""]
+  const resetBoard = () => board = Array(9).fill(EMPTY);
   const placeMarker = (marker, index) => board[index] = marker
-  
+
   const getWinner = () => {
     const win_combos = [
-      [0,1,2],[3,4,5],[6,7,8], // Horizontal
-      [0,3,6],[1,4,7],[2,5,8], // Vertical
-      [0,4,8],[2,4,6]          // Diagonal
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], // Horizontal
+      [0, 3, 6], [1, 4, 7], [2, 5, 8], // Vertical
+      [0, 4, 8], [2, 4, 6]          // Diagonal
     ]
 
     for (const combo of win_combos) {
       const mappedCombo = combo.map((i) => board[i]).reduce((t, v) => t + v)
-      if (mappedCombo === 3) {
-        return 1
-      } else if (mappedCombo === -3) {
-        return -1
-      }
+      if (Math.abs(mappedCombo) === 3) return mappedCombo / 3
     }
     return 0
   }
 
   const getValidMoves = () => {
     const moves = []
-    for (const [i,e] of board.entries()) {
+    for (const [i, e] of board.entries()) {
       if (!e) moves.push(i)
     }
     return moves
@@ -113,14 +110,14 @@ function getEasyMove() {
 
 function getMediumMove() {
   const validMoves = gameController.getValidMoves()
-    
+
   for (const player of [O, X]) {
     for (const move of validMoves) {
       gameController.placeMarker(player, move)
       if (gameController.getWinner() === player) {
         return move
       }
-      gameController.placeMarker("", move)
+      gameController.placeMarker(EMPTY, move)
     }
   }
 
@@ -136,7 +133,7 @@ function getHardMove() {
 }
 
 function minimax(player) {
- 
+
   const validMoves = gameController.getValidMoves()
   let best = [-1, -player]
   const winner = gameController.getWinner()
@@ -145,8 +142,8 @@ function minimax(player) {
 
   for (const choice of validMoves) {
     gameController.placeMarker(player, choice)
-    let score = minimax(-player)
-    gameController.placeMarker("", choice)
+    const score = minimax(-player)
+    gameController.placeMarker(EMPTY, choice)
     score[0] = choice
 
     if (player === O && (score[1] < best[1])) best = score
@@ -156,7 +153,7 @@ function minimax(player) {
 }
 
 function _clickEvent(e) {
-  if(e.target.hasAttribute("id") && !e.target.hasChildNodes()) {
+  if (e.target.hasAttribute("id") && !e.target.hasChildNodes()) {
     if (!gameController.isGameDone()) {
       const boxId = parseInt(e.target.id)
       gameController.placeMarker(X, boxId)
