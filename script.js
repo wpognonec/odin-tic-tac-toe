@@ -46,36 +46,47 @@ const gameController = (function () {
   const processRound = () => {
     const winner = game.getWinner()
     if (winner || !game.getValidMoves().length) {
-      if (winner === 1) {
-        gamesWon.player1++
-        gameDone = true
-        console.log("Winner is X");
-      } else if (winner === -1) {
-        gamesWon.player2++
-        gameDone = true
-        console.log("Winner is O")
-      } else {
-        gameDone = true
-        console.log("Game is a tie")
-      }
+      if (winner === 1) gamesWon.player1++
+      else if (winner === -1) gamesWon.player2++
+      gameDone = true
       displayController.updateScores()
     }
     
     
+  }
+  const computerPlay = () => {
+    const difficulty = gameController.getDifficulty()
+    let move
+    switch (difficulty) {
+      case "easy":
+        move = getMove.easy()
+        break
+      case "medium":
+        move = getMove.medium()
+        break
+      case "hard":
+        move = getMove.hard()
+        break
+      default:
+        move = getMove.easy()
+        break
+    }
+    gameController.placeMarker(O, move)
+    displayController.updateBoard()
   }
   const init = () => {
     game.resetBoard()
     gameDone = false
   }
 
-  return { getDifficulty, setDifficulty, getGamesWon, isGameDone, processRound, init, ...game }
+  return { getDifficulty, setDifficulty, getGamesWon, isGameDone, processRound, computerPlay, init, ...game }
 })()
 
 const displayController = (function () {
   function updateBoard() {
     const wrapper = document.querySelector("div.gameBoard")
-    wrapper.textContent = ""
     const board = gameController.getBoard()
+    wrapper.textContent = ""
     for (const mark in board) {
       const markDiv = document.createElement("div")
       if (board[mark] === 1 || board[mark] === -1) {
@@ -98,77 +109,57 @@ const displayController = (function () {
   return { updateBoard, updateScores }
 })()
 
-
-
-function computerPlay() {
-  const difficulty = gameController.getDifficulty()
-  let move
-  switch (difficulty) {
-    case "easy":
-      move = getEasyMove()
-      break
-    case "medium":
-      move = getMediumMove()
-      break
-    case "hard":
-      move = getHardMove()
-      break
-    default:
-      move = getEasyMove()
-      break
+const getMove = (function () {
+  function easy() {
+    const validMoves = gameController.getValidMoves()
+    return validMoves[Math.floor(Math.random() * validMoves.length)]
   }
-  gameController.placeMarker(O, move)
-  displayController.updateBoard()
-}
-
-function getEasyMove() {
-  const validMoves = gameController.getValidMoves()
-  return validMoves[Math.floor(Math.random() * validMoves.length)]
-}
-
-function getMediumMove() {
-  const validMoves = gameController.getValidMoves()
-
-  for (const player of [O, X]) {
-    for (const move of validMoves) {
-      gameController.placeMarker(player, move)
-      if (gameController.getWinner() === player) {
-        return move
+  
+  function medium() {
+    const validMoves = gameController.getValidMoves()
+  
+    for (const player of [O, X]) {
+      for (const move of validMoves) {
+        gameController.placeMarker(player, move)
+        if (gameController.getWinner() === player) {
+          return move
+        }
+        gameController.placeMarker(EMPTY, move)
       }
-      gameController.placeMarker(EMPTY, move)
     }
+  
+    if (validMoves.includes(4)) {
+      return 4
+    }
+  
+    return validMoves[Math.floor(Math.random() * validMoves.length)]
   }
-
-  if (validMoves.includes(4)) {
-    return 4
+  
+  function hard() {
+    return minimax(O)[0]
   }
-
-  return validMoves[Math.floor(Math.random() * validMoves.length)]
-}
-
-function getHardMove() {
-  return minimax(O)[0]
-}
-
-function minimax(player) {
-
-  const validMoves = gameController.getValidMoves()
-  let best = [-1, -player]
-  const winner = gameController.getWinner()
-
-  if (!validMoves.length || winner) return [-1, winner]
-
-  for (const choice of validMoves) {
-    gameController.placeMarker(player, choice)
-    const score = minimax(-player)
-    gameController.placeMarker(EMPTY, choice)
-    score[0] = choice
-
-    if (player === O && (score[1] < best[1])) best = score
-    else if (player === X && (score[1] > best[1])) best = score
+  
+  function minimax(player) {
+  
+    const validMoves = gameController.getValidMoves()
+    let best = [-1, -player]
+    const winner = gameController.getWinner()
+  
+    if (!validMoves.length || winner) return [-1, winner]
+  
+    for (const choice of validMoves) {
+      gameController.placeMarker(player, choice)
+      const score = minimax(-player)
+      gameController.placeMarker(EMPTY, choice)
+      score[0] = choice
+  
+      if (player === O && (score[1] < best[1])) best = score
+      else if (player === X && (score[1] > best[1])) best = score
+    }
+    return best
   }
-  return best
-}
+  return { easy, medium, hard }
+})()
 
 function _clickEvent(e) {
   if (e.target.hasAttribute("id") && !e.target.hasChildNodes()) {
@@ -179,7 +170,7 @@ function _clickEvent(e) {
       gameController.processRound()
     }
     if (!gameController.isGameDone()) {
-      computerPlay()
+      gameController.computerPlay()
       gameController.processRound()
     }
     if (gameController.isGameDone()) {
