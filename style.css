@@ -15,6 +15,7 @@ body {
   place-items: center;
   outline: 2px solid;
   outline-offset: -3px;
+  border-radius: 7px;
 }
 
 .gameFooter {
@@ -29,7 +30,7 @@ img {
 }
 
 button {
-  border: 1px solid;
+  border: 2px solid;
   border-radius: 5px;
 }
 

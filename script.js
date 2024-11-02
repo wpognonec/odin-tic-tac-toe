@@ -49,7 +49,7 @@ const gameController = (function () {
       if (winner === 1) gamesWon.player1++
       else if (winner === -1) gamesWon.player2++
       gameDone = true
-      displayController.updateScores()
+      displayController.updateScores(winner)
     }
     
     
@@ -99,11 +99,15 @@ const displayController = (function () {
     }
   }
   
-  function updateScores() {
+  function updateScores(winner) {
+    if (winner === 1 ) winner = "X"
+    if (winner === -1) winner = "O"
+    const gameStatus = document.querySelector("div.gameStatus")
     const p1Wins = document.querySelector("div.p1Wins")
     const p2Wins = document.querySelector("div.p2Wins")
-    p1Wins.textContent = `Player 1 has won ${gameController.getGamesWon().player1} games`
-    p2Wins.textContent = `Player 2 has won ${gameController.getGamesWon().player2} games`
+    gameStatus.textContent = winner ? `${winner} has won the game!` : "The game is a tie!"
+    p1Wins.textContent = `Player X has won ${gameController.getGamesWon().player1} games`
+    p2Wins.textContent = `Player O has won ${gameController.getGamesWon().player2} games`
   }
 
   return { updateBoard, updateScores }
