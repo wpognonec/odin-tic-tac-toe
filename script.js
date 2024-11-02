@@ -45,18 +45,23 @@ const gameController = (function () {
   const isGameDone = () => gameDone
   const processRound = () => {
     const winner = game.getWinner()
-    if (winner === 1) {
-      gamesWon.player1++
-      gameDone = true
-      console.log("Winner is X");
-    } else if (winner === -1) {
-      gamesWon.player2++
-      gameDone = true
-      console.log("Winner is O")
-    } else if (!game.getValidMoves().length) {
-      gameDone = true
-      console.log("Game is a tie")
+    if (winner || !game.getValidMoves().length) {
+      if (winner === 1) {
+        gamesWon.player1++
+        gameDone = true
+        console.log("Winner is X");
+      } else if (winner === -1) {
+        gamesWon.player2++
+        gameDone = true
+        console.log("Winner is O")
+      } else {
+        gameDone = true
+        console.log("Game is a tie")
+      }
+      displayController.updateScores()
     }
+    
+    
   }
   const init = () => {
     game.resetBoard()
@@ -66,21 +71,34 @@ const gameController = (function () {
   return { getDifficulty, setDifficulty, getGamesWon, isGameDone, processRound, init, ...game }
 })()
 
-function displayBoard() {
-  const wrapper = document.querySelector("div.gameBoard")
-  wrapper.textContent = ""
-  const board = gameController.getBoard()
-  for (const mark in board) {
-    const markDiv = document.createElement("div")
-    if (board[mark] === 1 || board[mark] === -1) {
-      const markImg = document.createElement("img")
-      markImg.src = board[mark] === 1 ? "images/x.svg" : "images/o.svg"
-      markDiv.appendChild(markImg)
+const displayController = (function () {
+  function updateBoard() {
+    const wrapper = document.querySelector("div.gameBoard")
+    wrapper.textContent = ""
+    const board = gameController.getBoard()
+    for (const mark in board) {
+      const markDiv = document.createElement("div")
+      if (board[mark] === 1 || board[mark] === -1) {
+        const markImg = document.createElement("img")
+        markImg.src = board[mark] === 1 ? "images/x.svg" : "images/o.svg"
+        markDiv.appendChild(markImg)
+      }
+      markDiv.id = mark
+      wrapper.appendChild(markDiv)
     }
-    markDiv.id = mark
-    wrapper.appendChild(markDiv)
   }
-}
+  
+  function updateScores() {
+    const p1Wins = document.querySelector("div.p1Wins")
+    const p2Wins = document.querySelector("div.p2Wins")
+    p1Wins.textContent = `Player 1 has won ${gameController.getGamesWon().player1} games`
+    p2Wins.textContent = `Player 2 has won ${gameController.getGamesWon().player2} games`
+  }
+
+  return { updateBoard, updateScores }
+})()
+
+
 
 function computerPlay() {
   const difficulty = gameController.getDifficulty()
@@ -100,7 +118,7 @@ function computerPlay() {
       break
   }
   gameController.placeMarker(O, move)
-  displayBoard()
+  displayController.updateBoard()
 }
 
 function getEasyMove() {
@@ -157,7 +175,7 @@ function _clickEvent(e) {
     if (!gameController.isGameDone()) {
       const boxId = parseInt(e.target.id)
       gameController.placeMarker(X, boxId)
-      displayBoard()
+      displayController.updateBoard()
       gameController.processRound()
     }
     if (!gameController.isGameDone()) {
@@ -166,15 +184,15 @@ function _clickEvent(e) {
     }
     if (gameController.isGameDone()) {
       const button = document.querySelector("#resetBtn")
-      button.removeAttribute("hidden")
+      button.removeAttribute("disabled")
     }
   }
 }
 
 function _resetGame(e) {
   gameController.init()
-  displayBoard()
-  e.target.setAttribute("hidden", null)
+  displayController.updateBoard()
+  e.target.setAttribute("disabled", null)
 }
 
 function _setDifficulty(e) {
