@@ -12,7 +12,7 @@ const Game = function () {
     const win_combos = [
       [0, 1, 2], [3, 4, 5], [6, 7, 8], // Horizontal
       [0, 3, 6], [1, 4, 7], [2, 5, 8], // Vertical
-      [0, 4, 8], [2, 4, 6]          // Diagonal
+      [0, 4, 8], [2, 4, 6]             // Diagonal
     ]
 
     for (const combo of win_combos) {
@@ -39,7 +39,6 @@ const gameController = (function () {
   let difficulty = "easy"
   let gameDone = false
   const gamesWon = { player1: 0, player2: 0 }
-  const getDifficulty = () => difficulty
   const setDifficulty = (val) => difficulty = val
   const getGamesWon = () => gamesWon
   const isGameDone = () => gameDone
@@ -51,11 +50,8 @@ const gameController = (function () {
       gameDone = true
       displayController.updateScores(winner)
     }
-    
-    
   }
   const computerPlay = () => {
-    const difficulty = gameController.getDifficulty()
     let move
     switch (difficulty) {
       case "easy":
@@ -79,7 +75,7 @@ const gameController = (function () {
     gameDone = false
   }
 
-  return { getDifficulty, setDifficulty, getGamesWon, isGameDone, processRound, computerPlay, init, ...game }
+  return { setDifficulty, getGamesWon, isGameDone, processRound, computerPlay, init, ...game }
 })()
 
 const displayController = (function () {
